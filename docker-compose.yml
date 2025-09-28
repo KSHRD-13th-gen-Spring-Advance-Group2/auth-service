@@ -1,0 +1,32 @@
+services:
+  keycloak_db:
+    image: postgres:15-alpine
+    container_name: keycloak-db-container
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 2003
+    ports:
+      - 5434:5432
+    volumes:
+      - keycloak_db_container_backup:/var/lib/postgresql/data
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: keycloak-test
+    command: start-dev
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://keycloak-db-container:5432/postgres
+      KC_DB_USERNAME: postgres
+      KC_DB_PASSWORD: 2003
+      KC_FEATURES: token-exchange,admin-fine-grained-authz
+    ports:
+      - "8080:8080"
+    depends_on:
+      - keycloak_db
+
+volumes:
+  keycloak_db_container_backup:
