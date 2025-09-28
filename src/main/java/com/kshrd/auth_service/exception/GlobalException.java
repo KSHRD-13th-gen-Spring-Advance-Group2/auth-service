@@ -81,7 +81,7 @@ public class GlobalException {
 
     @ExceptionHandler(KeycloakUnauthorizedException.class)
     public ResponseEntity<ProblemDetail> keycloakUnauthorizedException(KeycloakUnauthorizedException e) {
-        return problemDetailResponseEntity(e.getMessage(), HttpStatus.CONFLICT, e.getTitle());
+        return problemDetailResponseEntity(e.getMessage(), HttpStatus.UNAUTHORIZED, e.getTitle());
     }
 
     @ExceptionHandler(UserCreationException.class)
@@ -92,6 +92,11 @@ public class GlobalException {
     @ExceptionHandler(DuplicateUserException.class)
     public ResponseEntity<ProblemDetail> duplicateUserException(DuplicateUserException e) {
         return problemDetailResponseEntity(e.getMessage(), HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(CustomServiceUnavailableException.class)
+    public ResponseEntity<ProblemDetail> customServiceUnavailableException(CustomServiceUnavailableException e) {
+        return problemDetailResponseEntity(e.getMessage(), HttpStatus.SERVICE_UNAVAILABLE);
     }
 
     private static final Logger logger = LoggerFactory.getLogger(ExceptionHandler.class);

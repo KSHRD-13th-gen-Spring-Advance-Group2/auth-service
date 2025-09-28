@@ -6,15 +6,21 @@ import java.util.List;
 import java.util.Map;
 
 import org.keycloak.admin.client.Keycloak;
+import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
 import com.kshrd.auth_service.exception.DuplicateUserException;
+import com.kshrd.auth_service.exception.KeycloakUnauthorizedException;
 import com.kshrd.auth_service.exception.UserCreationException;
 import com.kshrd.auth_service.keycloak.KeycloakAdminConfig;
 import com.kshrd.auth_service.keycloak.KeycloakPropertiesConfig;
+import com.kshrd.auth_service.model.dto.request.ChangePasswordRequest;
+import com.kshrd.auth_service.model.dto.request.UpdateUserRequest;
 import com.kshrd.auth_service.model.dto.request.UserRequest;
 import com.kshrd.auth_service.model.entity.User;
 import com.kshrd.auth_service.service.UserService;
@@ -61,7 +67,7 @@ public class UserServiceImpl implements UserService {
         return userRepresentation;
     }
 
-        private User mapToUser(UserRepresentation userRepresentation) {
+    private User mapToUser(UserRepresentation userRepresentation) {
         return User.builder()
                 .id(userRepresentation.getId())
                 .username(userRepresentation.getUsername())
@@ -72,8 +78,13 @@ public class UserServiceImpl implements UserService {
                 .build();
     }
 
-    public List<User> getByEmail(String email) {
+    private List<User> findUserByEmail(String email) {
         return usersResourceInstance().searchByEmail(email, true).stream().map(u -> mapToUser(u)).toList();
+    }
+
+    private String getCurrentUserId() {
+        Jwt jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return jwt.getSubject();
     }
 
     @Override
@@ -100,7 +111,54 @@ public class UserServiceImpl implements UserService {
             throw new UserCreationException("error creating user");
         }
 
-        return getByEmail(request.getEmail()).get(0);
+        return findUserByEmail(request.getEmail()).get(0);
+    }
+
+    @Override
+    public User getUser() {
+        User foundUser = mapToUser(usersResourceInstance().get(getCurrentUserId()).toRepresentation());
+
+        if (foundUser == null) {
+            throw new KeycloakUnauthorizedException("Unauthorized");
+        }
+
+        return foundUser;
+    }
+
+    @Override
+    public User updateUser(UpdateUserRequest request) {
+        UserResource currentUserRepResource = usersResourceInstance().get(getCurrentUserId());
+
+        UserRepresentation user = currentUserRepResource.toRepresentation();
+        user.setFirstName(request.getFirstName());
+        user.setLastName(request.getLastName());
+
+        Map<String, List<String>> customAttributes = Map.of(
+                "imageUrl", Collections.singletonList(request.getImageUrl()));
+
+        user.setAttributes(customAttributes);
+        currentUserRepResource.update(user);
+
+        return mapToUser(user);
+    }
+
+    @Override
+    public User changeUserPassword(ChangePasswordRequest request) {
+        UserResource currentUserResource = usersResourceInstance().get(getCurrentUserId());
+
+        if (currentUserResource == null) {
+            throw new KeycloakUnauthorizedException("Unauthorized");
+        }
+
+        CredentialRepresentation newCredential = buildCredentialRepresentation(request.getPassword());
+        UserRepresentation user = currentUserResource.toRepresentation();
+        
+        // CredentialRepresentation oldCredential = user.getCredentials().get(0);
+        // currentUserResource.removeCredential(oldCredential.getId());
+
+        user.setCredentials(Collections.singletonList(newCredential));
+        currentUserResource.update(user);
+        return mapToUser(user);
     }
 
 }

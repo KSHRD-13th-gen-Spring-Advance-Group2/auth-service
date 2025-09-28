@@ -34,7 +34,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/v1/users").permitAll()
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth2 -> oauth2
-                        .jwt(Customizer.withDefaults()))
+                        .jwt(Customizer.withDefaults()).authenticationEntryPoint(keycloakAuthEntryPoint))
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(keycloakAuthEntryPoint));
 
         return httpSecurity.build();

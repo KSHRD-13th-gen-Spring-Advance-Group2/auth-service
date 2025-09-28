@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.kshrd.auth_service.model.dto.request.ChangePasswordRequest;
 import com.kshrd.auth_service.model.dto.request.UpdateUserRequest;
 import com.kshrd.auth_service.model.dto.request.UserRequest;
 import com.kshrd.auth_service.model.dto.response.ApiResponse;
@@ -27,13 +28,13 @@ public class UserController extends BaseController {
     @SecurityRequirement(name = "bearerAuth")
     @GetMapping
     public ResponseEntity<ApiResponse<User>> getUser() {
-        return null;
+        return responseEntity("Get user successfully", userService.getUser());
     }
 
     @SecurityRequirement(name = "bearerAuth")
     @PutMapping
     public ResponseEntity<ApiResponse<User>> updateUser(@RequestBody UpdateUserRequest request) {
-        return null;
+        return responseEntity("Update user info successfully", userService.updateUser(request));
     }
 
     @PostMapping
@@ -44,7 +45,7 @@ public class UserController extends BaseController {
 
     @SecurityRequirement(name = "bearerAuth")
     @PutMapping("/password")
-    public ResponseEntity<ApiResponse<User>> changeUserPassword(@RequestBody String password) {
-        return null;
+    public ResponseEntity<ApiResponse<User>> changeUserPassword(@RequestBody ChangePasswordRequest request) {
+        return responseEntity("Change password successfully", userService.changeUserPassword(request));
     }
 }
