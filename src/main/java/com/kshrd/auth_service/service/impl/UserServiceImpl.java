@@ -116,7 +116,7 @@ public class UserServiceImpl implements UserService {
             throw new UserCreationException("error creating user");
         }
 
-        return findUserByEmail(request.getEmail()).get(0);
+        return findUserByEmail(request.getEmail()).getFirst();
     }
 
     @Override
