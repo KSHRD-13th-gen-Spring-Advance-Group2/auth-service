@@ -4,6 +4,7 @@ import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.UserResource;
@@ -50,8 +51,12 @@ public class UserServiceImpl implements UserService {
     }
 
     private UserRepresentation mapToUserRepresentation(UserRequest user) {
+        Random rnd = new Random();
+        int number = rnd.nextInt(999);
+
+        String generatedUsername = user.getFirstName().toLowerCase() + "." + user.getLastName().toLowerCase() + "." + String.format("%03d", number);
         UserRepresentation userRepresentation = new UserRepresentation();
-        userRepresentation.setUsername(user.getUsername());
+        userRepresentation.setUsername(generatedUsername);
         userRepresentation.setCredentials(Collections.singletonList(buildCredentialRepresentation(user.getPassword())));
         userRepresentation.setEnabled(true);
         userRepresentation.setEmail(user.getEmail());
@@ -94,10 +99,10 @@ public class UserServiceImpl implements UserService {
         try (Response response = usersResourceInstance().create(userRepresentation)) {
             int statusCode = response.getStatus();
             switch (statusCode) {
-                case 201 -> log.info("User {} successfully created in Keycloak", request.getUsername());
+                case 201 -> log.info("User successfully created in Keycloak");
                 case 409 -> {
-                    log.error("Duplicate user {}", request.getUsername());
-                    throw new DuplicateUserException("User with username: " + request.getUsername() + " already exist");
+                    log.error("Duplicate user");
+                    throw new DuplicateUserException("User with email: " + request.getEmail() + " already exist");
                 }
                 default -> {
                     log.error("Error creating user: status code {}", statusCode);
@@ -111,7 +116,7 @@ public class UserServiceImpl implements UserService {
             throw new UserCreationException("error creating user");
         }
 
-        return findUserByEmail(request.getEmail()).get(0);
+        return findUserByEmail(request.getEmail()).getFirst();
     }
 
     @Override

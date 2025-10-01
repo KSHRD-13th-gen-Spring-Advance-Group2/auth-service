@@ -1,5 +1,6 @@
 package com.kshrd.auth_service.controller;
 
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,19 +34,19 @@ public class UserController extends BaseController {
 
     @SecurityRequirement(name = "bearerAuth")
     @PutMapping
-    public ResponseEntity<ApiResponse<User>> updateUser(@RequestBody UpdateUserRequest request) {
+    public ResponseEntity<ApiResponse<User>> updateUser(@RequestBody @Valid UpdateUserRequest request) {
         return responseEntity("Update user info successfully", userService.updateUser(request));
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<User>> registerNewUser(@RequestBody UserRequest request) {
+    public ResponseEntity<ApiResponse<User>> registerNewUser(@RequestBody @Valid UserRequest request) {
         return responseEntity("Register new user successfully", HttpStatus.CREATED,
                 userService.registerNewUser(request));
     }
 
     @SecurityRequirement(name = "bearerAuth")
     @PutMapping("/password")
-    public ResponseEntity<ApiResponse<User>> changeUserPassword(@RequestBody ChangePasswordRequest request) {
+    public ResponseEntity<ApiResponse<User>> changeUserPassword(@RequestBody @Valid ChangePasswordRequest request) {
         return responseEntity("Change password successfully", userService.changeUserPassword(request));
     }
 }
