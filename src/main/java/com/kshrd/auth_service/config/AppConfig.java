@@ -15,3 +15,4 @@ public class AppConfig {
         return builder.baseUrl(keycloakPropertiesConfig.getEndpoint()).build();
     }
 }
+

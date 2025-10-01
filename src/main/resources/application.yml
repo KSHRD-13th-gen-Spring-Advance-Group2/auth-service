@@ -9,6 +9,8 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: http://localhost:8090/realms/mini-project
+  config:
+    import: configserver:http://localhost:8888
 
 eureka:
   client:
