@@ -22,7 +22,7 @@ keycloak:
   endpoint: http://localhost:8090
   application:
     client-id: auth-service
-    client-secret: f76qCsAWdpTtJG2tw4U1jbe8iestlj7l
+    client-secret: yvYjkkXdyk81KJDeJ37E4CKeAL69MIAn
 
 management:
   tracing:

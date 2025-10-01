@@ -14,9 +14,4 @@ public class AppConfig {
             KeycloakPropertiesConfig keycloakPropertiesConfig) {
         return builder.baseUrl(keycloakPropertiesConfig.getEndpoint()).build();
     }
-
-    @Bean
-    RestTemplate restTemplate() {
-        return new RestTemplate();
-    }
 }
