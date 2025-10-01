@@ -9,9 +9,9 @@ public abstract class BaseController {
     public <T> ResponseEntity<ApiResponse<T>> responseEntity(String message, HttpStatus httpStatus,
             T payload) {
         ApiResponse<T> response = ApiResponse.<T>builder()
-                .success(true)
                 .payload(payload)
                 .message(message)
+                .status(httpStatus)
                 .build();
         return ResponseEntity.status(httpStatus).body(response);
     }
