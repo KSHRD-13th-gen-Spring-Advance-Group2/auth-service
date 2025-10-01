@@ -24,19 +24,20 @@ keycloak:
     client-id: auth-service
     client-secret: f76qCsAWdpTtJG2tw4U1jbe8iestlj7l
 
-# management:
-#   endpoints:
-#     web:
-#       exposure:
-#         include: health,info,metrics
-#   tracing:
-#     sampling:
-#       probability: 1.0
-#     enabled: true
-#   zipkin:
-#     tracing:
-#       endpoint: http://localhost:9411/api/v2/spans
-#       encoding: json
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+    propagation:
+      enabled: true
+  zipkin:
+    tracing:
+      enabled: true
+      endpoint: http://localhost:9411/api/v2/spans
+      connect-timeout: 5000
+      read-timeout: 10000
+      flush-interval: 1000
+      batch-size: 10
 
 server:
   port: 8100
