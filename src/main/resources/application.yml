@@ -19,6 +19,12 @@ eureka:
     service-url:
       defaultZone: http://35.209.164.72:8761/eureka/
 
+  instance:
+    prefer-ip-address: true
+    lease-renewal-interval-in-seconds: 5
+    lease-expiration-duration-in-seconds: 10
+    instance-id: "${spring.application.name}:${server.port}"
+
 keycloak:
   realm: mini-project
   endpoint: http://35.209.164.72:8080
